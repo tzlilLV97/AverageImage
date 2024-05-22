@@ -95,37 +95,6 @@ def create_collage(rows_of_images, output_file, text=None):
 
     # Save the new image
     new_image.save(output_file)
-def create_image(first_row_images, second_row_images, output_file,text=None):
-    # Determine the size of the new image
-    max_width_first_row = max(img.width for img in first_row_images)
-    max_width_second_row = max(img.width for img in second_row_images)
-    max_height = max(img.height for img in first_row_images + second_row_images)
-    new_width = max(max_width_first_row, max_width_second_row) * max(len(first_row_images), len(second_row_images))
-    new_height = max_height * 2 + 50  # Extra space for the text
-
-    # Create a new blank image
-    new_image = Image.new('RGB', (new_width, new_height), color='white')
-
-    # Paste images in the first row
-    x_offset_first_row = (new_width - max_width_first_row * len(first_row_images)) // 2
-    for img in first_row_images:
-        new_image.paste(img, (x_offset_first_row, 0))
-        x_offset_first_row += max_width_first_row
-
-    # Paste images in the second row
-    x_offset_second_row = (new_width - max_width_second_row * len(second_row_images)) // 2
-    for img in second_row_images:
-        new_image.paste(img, (x_offset_second_row, max_height))
-        x_offset_second_row += max_width_second_row
-
-    # Add text to the image
-    if text is not None:
-        font = ImageFont.load_default()  # You can change the font and size as needed
-        draw = ImageDraw.Draw(new_image)
-        text_position = (new_width // 2 - 50, new_height - 50)
-        draw.text(text_position, text, fill='black', font=font)
-# Save the new image
-    new_image.save(output_file)
 def create_gif(image_list, output_file, duration=0.1, loop=0,cyclic=True):
     """
     Create a GIF from a list of PIL images.
@@ -193,29 +162,6 @@ def reconstruct(images_dir, seeds=[3,15,20,35,40,43,47,50]):
         create_image([convert_to_specific_size(image, HEIGHT, WIDTH)], temp_list, f"Rec_Res/{i}_h{variation['h']}_w{variation['w']}_seed{seed}_steps{variation['num_steps']}.png")
         i += 1
     return
-def gen_variations(seed=-1, which_to_keep=-1, which_to_reconstruct=-1):
-    if which_to_reconstruct != -1:
-        plot_variations = [
-            {"num_steps": 150, "h": HEIGHT, "w": WIDTH, "PCA_components": len(images_texts), "which_to_keep": [], \
-             "which_to_reconstruct": [i], "seed": i + 1} for i in range(len(images_texts) - 1)]
-    return 0
-def unique_variations(plot_variations, len_images_texts):
-    # plot_variations = [{"num_steps": 150, "h": HEIGHT, "w": WIDTH, "PCA_components": i, "which_to_keep": []} for i in range(1, 17)]
-    # plot_variations = [{"num_steps": 150, "h": HEIGHT, "w": WIDTH, "PCA_components": 0, "which_to_keep": []}]
-    plot_variations_unique = []
-    plot_variations_set = set()
-
-    for variation in plot_variations:
-        # Convert 'which_to_keep' to tuple for hashing
-        variation_tuple = (variation["num_steps"], variation["h"], variation["w"], variation["PCA_components"],
-                           tuple(variation["which_to_keep"]))
-
-        # Check if the variation is unique
-        if variation_tuple not in plot_variations_set:
-            plot_variations_set.add(variation_tuple)
-            plot_variations_unique.append(variation)
-    print(plot_variations_unique)
-    return plot_variations_unique
 
 def exp_Amp_PCA_AVG(seed=43):
     data_dir = "cat_prompts/"
